@@ -25,7 +25,7 @@ check_globals() {
 set_check_globals(){
     local fct_name="${FUNCNAME[0]}()"
     debug_ "Vérification des variables globales"
-    [[ -z $COMMAND_NAME  ]] && eout "${fct_name} : La variable globale COMMAND_NAME doit être initialisée"
+    [[ -z $COMMAND_NAME ]] && eout "${fct_name} : La variable globale COMMAND_NAME doit être initialisée"
     [[ -z $NWD_DB_ADDR ]]  && eout "${fct_name} : La variable globale NWD_DB_ADDR doit être initialisée dans le .env"
     [[ -z $NWD_DB_ADDR ]]  && eout "${fct_name} : La variable globale NWD_DB_ADDR doit être initialisée dans le .env"
 }
