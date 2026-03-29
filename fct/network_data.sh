@@ -9,8 +9,18 @@ usage() {
 
 # Initialise et vérifie les variables globales
 # return empty|exit
-check_globals(){
+check_globals() {
+    local prev_function="${FUNCNAME[1]:-FUNCNAME[2]}"
+    local fct_name
+    local vars_to_check=$1
+    local missing_count=0
 
+    for var_name in $vars_to_check; do
+        if [[ -z "${!var_name}" ]]; then
+            eout "La variable globale '$var_name' n'est pas initialisée."
+            ((missing_count++))
+        fi
+    done
 }
 set_check_globals(){
     local fct_name="${FUNCNAME[0]}()"
