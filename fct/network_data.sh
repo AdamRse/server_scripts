@@ -7,7 +7,8 @@ usage() {
     echo "          --debug         active les logs de débugage"
 }
 
-# Initialise et vérifie les variables globales
+# Vérifie si les variables données sont globales
+# $1    : vars_to_check : tableau de variables, chaîne avec un séparateur espace, sans $
 # return empty|exit
 check_globals() {
     local prev_function="${FUNCNAME[1]:-FUNCNAME[2]}"
@@ -22,6 +23,9 @@ check_globals() {
         fi
     done
 }
+
+# Initialise et vérifie les variables globales
+# return empty|exit
 set_check_globals(){
     local fct_name="${FUNCNAME[0]}()"
     debug_ "Vérification des variables globales"
