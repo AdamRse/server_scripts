@@ -20,5 +20,11 @@ check_packages
 set_check_globals
 check_connect_db
 
+count=1
+while true; do
+
+    ((count++))
+    sleep 1
+done
 
 echo "ok"
