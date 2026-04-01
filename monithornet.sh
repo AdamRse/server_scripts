@@ -29,12 +29,19 @@ check_connect_db
 count=1
 double_check=false
 while true; do
-    answer1_ms=$(ping -c 1 -W $PING_BYTE_SIZE -s $PING_BYTE_SIZE "${PING_SERV1}" | grep "time=" | sed 's/.*time=\([0-9.]*\).*/\1/')
+    lout "boucle ${count}"
+
+    answer1_ms=$(send_ping "${PING_SERV1}")
     if [[ -z $answer1_ms ]] || [[ $(echo "${answer1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
-        answer2_ms=$(ping -c 1 -W $PING_BYTE_SIZE -s $PING_BYTE_SIZE "${PING_SERV2}" | grep "time=" | sed 's/.*time=\([0-9.]*\).*/\1/')
-
-
-
+        answer2_ms=$(send_ping "${PING_SERV2}")
+        if [[ -z $answer2_ms ]] || [[ $(echo "${answer2_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
+            # problème confirmé
+            if [[ -z $answer1_ms ]]; then
+            elif [[ $(echo "${answer1_ms} < ${LEVEL_2_MS}" | bc) = 1  ]]; then
+            elif [[ $(echo "${answer1_ms} < ${LEVEL_3_MS}" | bc) = 1  ]]; then
+            else
+            if
+        fi
     fi
 
 

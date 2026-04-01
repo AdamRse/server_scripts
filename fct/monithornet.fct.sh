@@ -58,3 +58,9 @@ check_ping() {
         return 1
     fi
 }
+
+#
+send_ping(){
+    local ping_location="${1}"
+    ping -c 1 -W $PING_BYTE_SIZE -s $PING_BYTE_SIZE "${ping_location}" | grep "time=" | sed 's/.*time=\([0-9.]*\).*/\1/'
+}
