@@ -14,7 +14,7 @@ usage(){
 set_check_globals(){
     local fct_name="${FUNCNAME[0]}()"
     debug_ "Vérification des variables globales"
-    check_vars_exist "COMMAND_NAME NWD_DB_ADDR NWD_DB_NAME PING_SERV1 PING_SERV2"
+    check_vars_exist "COMMAND_NAME NWD_DB_ADDR NWD_DB_NAME PING_SERV1 PING_SERV2 LEVEL_1_MS LEVEL_2_MS LEVEL_3_MS"
 
     lout "Vérification de la disponnibilité des serveurs de test"
     ! check_ping $PING_SERV1 && eout "Le serveur de test primaire ${PING_SERV1} ne ping pas"
