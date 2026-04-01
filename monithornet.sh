@@ -29,15 +29,15 @@ check_connect_db
 count=1
 double_check=false
 while true; do
-    [[ $double_check = true ]] && double_check=false
     answer1_ms=$(ping -c 1 -W $PING_BYTE_SIZE -s $PING_BYTE_SIZE "${PING_SERV1}" | grep "time=" | sed 's/.*time=\([0-9.]*\).*/\1/')
-    if [[ -z $answer1_ms ]] || [[ $(echo "${answer1_ms} < ${LEVEL_3_MS}" | bc) = 1 ]]; then
-        double_check=true
-    fi
+    if [[ -z $answer1_ms ]] || [[ $(echo "${answer1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
+        answer2_ms=$(ping -c 1 -W $PING_BYTE_SIZE -s $PING_BYTE_SIZE "${PING_SERV2}" | grep "time=" | sed 's/.*time=\([0-9.]*\).*/\1/')
 
 
 
     fi
+
+
     ((count++))
     sleep $LOOP_TIME_SEC
 done
