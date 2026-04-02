@@ -1,0 +1,15 @@
+[Unit]
+Description=Service de surveillance réseau Monithornet
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=root
+Group=root
+Type=simple
+ExecStart=/opt/server_scripts/monithornet.sh
+Restart=on-failure
+WorkingDirectory=/opt/server_scripts
+
+[Install]
+WantedBy=multi-user.target
