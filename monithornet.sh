@@ -35,7 +35,7 @@ while true; do
     if [[ -z $answer1_ms ]] || [[ $(echo "${answer1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
         answer2_ms=$(send_ping "${PING_SERV2}")
         if [[ -z $answer2_ms ]] || [[ $(echo "${answer2_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
-            # problème confirmé
+            # problème confirmé, gravité à déterminer
             if [[ -z $answer1_ms ]]; then
                 MONITOR_LEVEL_ID=4
                 MONITOR_PING_MS=$answer1_ms
@@ -48,12 +48,11 @@ while true; do
             else
                 MONITOR_LEVEL_ID=3
                 MONITOR_PING_MS=$answer1_ms
-            if
+            fi
             lout "Ping : ${MONITOR_PING_MS}ms\nNiveau : ${MONITOR_LEVEL_ID}"
             db_insert_into_incident ${MONITOR_LEVEL_ID} ${MONITOR_PING_MS}
         fi
     fi
-
 
     ((count++))
     sleep $LOOP_TIME_SEC

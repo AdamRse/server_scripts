@@ -59,6 +59,7 @@ check_ping() {
     fi
 }
 
+# return integer|empty
 send_ping(){
     ping -c 1 -W $PING_TIMEOUT_SEC -s $PING_BYTE_SIZE "${1}" | awk -F'[= ]' '/time=/{printf "%.0f", $(NF-1)}'
 }
