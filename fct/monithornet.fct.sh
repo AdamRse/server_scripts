@@ -59,8 +59,12 @@ check_ping() {
     fi
 }
 
-#
 send_ping(){
-    local ping_location="${1}"
-    ping -c 1 -W $PING_BYTE_SIZE -s $PING_BYTE_SIZE "${ping_location}" | grep "time=" | sed 's/.*time=\([0-9.]*\).*/\1/'
+    ping -c 1 -W $PING_TIMEOUT_SEC -s $PING_BYTE_SIZE "${1}" | awk -F'[= ]' '/time=/{printf "%.0f", $(NF-1)}'
+}
+
+db_insert_into_incident(){
+    local level_id=${1}
+    local ping_ms=${2}
+    mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"
 }

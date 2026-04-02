@@ -20,7 +20,7 @@ check_packages
 set_check_globals
 check_connect_db
 
-[[ $PING_BYTE_SIZE =~ ^[0-9]{1,3}$ && $PING_BYTE_SIZE -gt 0 && $PING_BYTE_SIZE -lt 256 ]] || eout "La variable PING_BYTE_SIZE doit être un entier entre 1 et 255 (taille du ping en octet)"
+[[ $PING_BYTE_SIZE =~ ^[0-9]{1,3}$ && $PING_BYTE_SIZE -gt 15 && $PING_BYTE_SIZE -lt 256 ]] || eout "La variable PING_BYTE_SIZE doit être un entier entre 16 et 255 (taille du ping en octet)"
 [[ $PING_TIMEOUT_SEC -gt 0 && $PING_TIMEOUT_SEC -lt 11 ]] || eout "La variable PING_TIMEOUT_SEC doit être un entier entre 1 et 10 (délai d'attente en secondes de la réponse ping)"
 [[ $LOOP_TIME_SEC -gt 0 && $LOOP_TIME_SEC -lt 601 ]] || eout "La variable LOOP_TIME_SEC doit être un entier entre 1 et 600 (temps d'attente en seconde entre 2 ping)"
 
@@ -37,10 +37,20 @@ while true; do
         if [[ -z $answer2_ms ]] || [[ $(echo "${answer2_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
             # problème confirmé
             if [[ -z $answer1_ms ]]; then
+                MONITOR_LEVEL_ID=4
+                MONITOR_PING_MS=$answer1_ms
             elif [[ $(echo "${answer1_ms} < ${LEVEL_2_MS}" | bc) = 1  ]]; then
+                MONITOR_LEVEL_ID=1
+                MONITOR_PING_MS=$answer1_ms
             elif [[ $(echo "${answer1_ms} < ${LEVEL_3_MS}" | bc) = 1  ]]; then
+                MONITOR_LEVEL_ID=2
+                MONITOR_PING_MS=$answer1_ms
             else
+                MONITOR_LEVEL_ID=3
+                MONITOR_PING_MS=$answer1_ms
             if
+            lout "Ping : ${MONITOR_PING_MS}ms\nNiveau : ${MONITOR_LEVEL_ID}"
+            db_insert_into_incident ${MONITOR_LEVEL_ID} ${MONITOR_PING_MS}
         fi
     fi
 
