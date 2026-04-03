@@ -10,7 +10,6 @@ Type=simple
 ExecStart=/opt/server_scripts/monithornet.sh
 Restart=on-failure
 WorkingDirectory=/opt/server_scripts
-Environment=TERM=xterm-256color
 
 [Install]
 WantedBy=multi-user.target
