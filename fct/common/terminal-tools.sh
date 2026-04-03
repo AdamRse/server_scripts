@@ -9,7 +9,8 @@ S_BOLD=""
 S_END=""
 
 # Mode terminal
-if [ -t 1 ]; then
+
+    TERM=${TERM:-xterm-256color}
     # Styles pour les logs
     S_ERROR=$(tput setaf 9)         # Rouge vif
     #S_ERROR='\e[38;5;9m'           # Rouge vif
@@ -26,7 +27,7 @@ if [ -t 1 ]; then
     S_BOLD=$(tput bold)             # Gras
     S_END=$(tput sgr0)              # Balise de fin de styles
     #S_END='\033[0m'                # Balise de fin de styles
-fi
+
 
 # -- LOGS --
 
