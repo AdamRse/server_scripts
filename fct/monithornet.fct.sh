@@ -59,11 +59,13 @@ check_ping() {
     fi
 }
 
+
 # return integer|empty
 send_ping(){
     ping -c 1 -W $PING_TIMEOUT_SEC -s $PING_BYTE_SIZE "${1}" | awk -F'[= ]' '/time=/{printf "%.0f", $(NF-1)}'
 }
 
+# return bool
 db_insert_into_incident(){
     local level_id=${1}
     local ping_ms=${2}
