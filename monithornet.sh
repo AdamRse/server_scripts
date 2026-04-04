@@ -35,7 +35,7 @@ while true; do
     if [[ -z $answer1_ms ]] || [[ $(echo "${answer1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
         answer2_ms=$(send_ping "${PING_SERV2}")
         if [[ -z $answer2_ms ]] || [[ $(echo "${answer2_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
-            # problème confirmé, gravité à déterminer
+            # problème confirmé, gravité à déterminer à partir de answer1
             if [[ -z $answer1_ms ]]; then
                 MONITOR_LEVEL_ID=4
                 MONITOR_PING_MS=$answer1_ms
