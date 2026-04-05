@@ -1,4 +1,6 @@
 #!/bin/bash
+# Installer en tant que service.
+# Peut être utilisé pour actualier le template, mais i faudra redémarrer le service
 
 MAIN_SCRIPT_PATH="$(readlink -f "${0}")"
 INSTALL_SERVICE_DIR="$(dirname "${MAIN_SCRIPT_PATH}")"
