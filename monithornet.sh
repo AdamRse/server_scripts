@@ -14,7 +14,6 @@ source "${ROOT_DIR}/.env" || wout "Aucun .env détecté à la racine, les variab
 
 source "${ROOT_DIR}/src/opt-parser/monithornet.parser.sh" || exit 1
 
-
 # -- CHECKS --
 check_packages
 set_check_globals
@@ -23,7 +22,6 @@ check_connect_db
 [[ $PING_BYTE_SIZE =~ ^[0-9]{1,3}$ && $PING_BYTE_SIZE -gt 15 && $PING_BYTE_SIZE -lt 256 ]] || eout "La variable PING_BYTE_SIZE doit être un entier entre 16 et 255 (taille du ping en octet)"
 [[ $PING_TIMEOUT_SEC -gt 0 && $PING_TIMEOUT_SEC -lt 11 ]] || eout "La variable PING_TIMEOUT_SEC doit être un entier entre 1 et 10 (délai d'attente en secondes de la réponse ping)"
 [[ $LOOP_TIME_SEC -gt 0 && $LOOP_TIME_SEC -lt 601 ]] || eout "La variable LOOP_TIME_SEC doit être un entier entre 1 et 600 (temps d'attente en seconde entre 2 ping)"
-
 
 # -- MAIN --
 count=1
