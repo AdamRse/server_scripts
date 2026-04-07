@@ -5,6 +5,7 @@ Wants=network-online.target
 
 [Service]
 User=monithornet
+Group=monithornet
 Type=simple
 ExecStart=/opt/server_scripts/monithornet.sh
 Restart=on-failure
