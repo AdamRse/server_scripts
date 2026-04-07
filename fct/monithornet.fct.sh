@@ -81,7 +81,7 @@ db_insert_into_incident(){
     local ping_ms=${2}
 
     if [[ $DB_SOCKET_CONNECT = true ]]; then
-        mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});")
+        mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"
     else
         mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"
     fi
