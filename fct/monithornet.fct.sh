@@ -16,7 +16,7 @@ set_check_globals(){
     debug_ "Vérification des variables globales"
     check_vars_exist "COMMAND_NAME PING_SERV1 PING_SERV2 LEVEL_1_MS LEVEL_2_MS LEVEL_3_MS"
 
-    [[ -n $NWD_DB_ADDR ]] && [[ -z $NWD_DB_USER ]] && eout "Spécifiez un utilisateur mysql dans NWD_DB_USER (.env) pour une connexion distante (NWD_DB_ADDR)"
+    [[ -n $NWD_DB_ADDR ]] && [[ -z $NWD_DB_USER ]] && eout "Spécifiez un utilisateur mysql dans NWD_DB_USER (.env) pour une connexion distante (NWD_DB_ADDR). Pour une connexion locale, laissez NWD_DB_ADDR vide dans le .env"
 
     lout "Vérification de la disponibilité des serveurs de test"
     ! check_ping $PING_SERV1 && eout "Le serveur de test primaire ${PING_SERV1} ne ping pas"
@@ -36,10 +36,10 @@ check_connect_db(){
     local table="incident"
     local connect_db
     if [[ -n $NWD_DB_ADDR ]]; then
-        LOCAL_DB=true
+        DB_SOCKET_CONNECT=true
         connect_db="$(mysql "${NWD_DB_NAME}" -e "DESCRIBE ${table};")"
     else
-        LOCAL_DB=false
+        DB_SOCKET_CONNECT=false
         connect_db="$(mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "DESCRIBE ${table};")"
     fi
     if [[ $? = 0 ]]; then
@@ -80,7 +80,7 @@ db_insert_into_incident(){
     local level_id=${1}
     local ping_ms=${2}
 
-    if [[ $LOCAL_DB = true ]]; then
+    if [[ $DB_SOCKET_CONNECT = true ]]; then
         mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});")
     else
         mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"

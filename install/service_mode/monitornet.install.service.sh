@@ -9,6 +9,7 @@ ROOT_DIR="${MAIN_SCRIPT_PATH%/*/*/*}"
 source "${ROOT_DIR}/fct/common/terminal-tools.sh" || exit 1
 source "${ROOT_DIR}/fct/common/common-tools.sh" || exit 1
 
+service_user="monithoret"
 service_name="monithornet.service"
 service_path="/etc/systemd/system/${service_name}"
 template_service_path="${INSTALL_SERVICE_DIR}/files/monithornet.service"
