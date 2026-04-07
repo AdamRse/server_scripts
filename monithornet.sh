@@ -6,6 +6,7 @@ ROOT_DIR="$(dirname "${MAIN_SCRIPT_PATH}")"
 
 DEBUG_MODE=false
 COMMAND_NAME="./${MAIN_SCRIPT_PATH}"
+LOCAL_DB=true
 
 source "${ROOT_DIR}/fct/common/terminal-tools.sh" || exit 1
 source "${ROOT_DIR}/fct/common/common-tools.sh" || exit 1

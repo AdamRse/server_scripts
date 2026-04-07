@@ -14,9 +14,11 @@ usage(){
 set_check_globals(){
     local fct_name="${FUNCNAME[0]}()"
     debug_ "Vérification des variables globales"
-    check_vars_exist "COMMAND_NAME NWD_DB_ADDR NWD_DB_NAME PING_SERV1 PING_SERV2 LEVEL_1_MS LEVEL_2_MS LEVEL_3_MS"
+    check_vars_exist "COMMAND_NAME PING_SERV1 PING_SERV2 LEVEL_1_MS LEVEL_2_MS LEVEL_3_MS"
 
-    lout "Vérification de la disponnibilité des serveurs de test"
+    [[ -n $NWD_DB_ADDR ]] && [[ -z $NWD_DB_USER ]] && eout "Spécifiez un utilisateur mysql dans NWD_DB_USER (.env) pour une connexion distante (NWD_DB_ADDR)"
+
+    lout "Vérification de la disponibilité des serveurs de test"
     ! check_ping $PING_SERV1 && eout "Le serveur de test primaire ${PING_SERV1} ne ping pas"
     ! check_ping $PING_SERV2 && eout "Le serveur de test secondaire ${PING_SERV2} ne ping pas"
     [[ -n $PING_SERV3 ]] && ! check_ping $PING_SERV3 && eout "Le serveur de test tertiaire ${PING_SERV3} ne ping pas"
@@ -33,7 +35,13 @@ check_packages(){
 check_connect_db(){
     local table="incident"
     local connect_db
-    connect_db="$(mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "DESCRIBE ${table};")"
+    if [[ -n $NWD_DB_ADDR ]]; then
+        LOCAL_DB=true
+        connect_db="$(mysql "${NWD_DB_NAME}" -e "DESCRIBE ${table};")"
+    else
+        LOCAL_DB=false
+        connect_db="$(mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "DESCRIBE ${table};")"
+    fi
     if [[ $? = 0 ]]; then
         debug_ "✅ La table ${table} est accessible."
         return 0
@@ -64,9 +72,17 @@ send_ping(){
     ping -c 1 -W $PING_TIMEOUT_SEC -s $PING_BYTE_SIZE "${1}" | awk -F'[= ]' '/time=/{printf "%.0f", $(NF-1)}'
 }
 
+# Requête mysql pour ajouter un incident à la base de données
+# $1    : level_id  : int   : Niveu de l'incident (id de la table level)
+# $2    : ping_ms   : int   : Durée du ping
 # return bool
 db_insert_into_incident(){
     local level_id=${1}
     local ping_ms=${2}
-    mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"
+
+    if [[ $LOCAL_DB = true ]]; then
+        mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});")
+    else
+        mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"
+    fi
 }
