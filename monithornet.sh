@@ -24,7 +24,7 @@ check_connect_db
 [[ $PING_TIMEOUT_SEC -gt 0 && $PING_TIMEOUT_SEC -lt 11 ]] || eout "La variable PING_TIMEOUT_SEC doit être un entier entre 1 et 10 (délai d'attente en secondes de la réponse ping)"
 [[ $LOOP_TIME_SEC -gt 0 && $LOOP_TIME_SEC -lt 601 ]] || eout "La variable LOOP_TIME_SEC doit être un entier entre 1 et 600 (temps d'attente en seconde entre 2 ping)"
 
-if [[ $DB_SOCKET_CONNECT =true ]]; then
+if [[ $DB_SOCKET_CONNECT = true ]]; then
     lout "Connexion à la base de données en mode socket"
 else
     lout "Connexion à la base de données en mode login"
