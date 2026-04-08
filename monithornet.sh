@@ -37,7 +37,7 @@ lout "Durée entre 2 ping : ${LOOP_TIME_SEC}s"
 count=1
 double_check=false
 while true; do
-    lout "boucle ${count}"
+    debug_ "boucle ${count}"
 
     answer1_ms=$(send_ping "${PING_SERV1}")
     if [[ -z $answer1_ms ]] || [[ $(echo "${answer1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
