@@ -35,7 +35,7 @@ check_packages(){
 check_connect_db(){
     local table="incident"
     local connect_db
-    if [[ -n $NWD_DB_ADDR ]]; then
+    if [[ -z $NWD_DB_ADDR ]]; then
         DB_SOCKET_CONNECT=true
         connect_db="$(mysql "${NWD_DB_NAME}" -e "DESCRIBE ${table};")"
     else
