@@ -69,20 +69,23 @@ check_ping() {
 
 # return integer|empty
 send_ping(){
-    ping -c 1 -W $PING_TIMEOUT_SEC -s $PING_BYTE_SIZE "${1}" | awk -F'[= ]' '/time=/{printf "%.0f", $(NF-1)}'
+    LAST_PING_TEXT="$(ping -c 1 -W $PING_TIMEOUT_SEC -s $PING_BYTE_SIZE "${1}")"
+    LAST_PING_MS="$(awk -F'[= ]' '/time=/{printf "%.0f", $(NF-1)}' <<< ${LAST_PING_TEXT})"
 }
 
 # Requête mysql pour ajouter un incident à la base de données
-# $1    : level_id  : int   : Niveu de l'incident (id de la table level)
-# $2    : ping_ms   : int   : Durée du ping
+# $1    : level_id      : int       : Niveu de l'incident (id de la table level)
+# $2    : ping_ms       : int       : Durée du ping
+# $3    : full_answer   : text<511  : Message complet de la commande ping
 # return bool
 db_insert_into_incident(){
     local level_id=${1}
     local ping_ms=${2}
+    local full_answer="${3//\'/\\\'}"
 
     if [[ $DB_SOCKET_CONNECT = true ]]; then
-        mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"
+        mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms}, '${full_answer}');" > /dev/null
     else
-        mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms});"
+        mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms}, '${full_answer}');" > /dev/null
     fi
 }

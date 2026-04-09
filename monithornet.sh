@@ -8,6 +8,9 @@ DEBUG_MODE=false
 COMMAND_NAME="./${MAIN_SCRIPT_PATH}"
 DB_SOCKET_CONNECT=true
 
+LAST_PING_TEXT=""
+LAST_PING_MS=""
+
 source "${ROOT_DIR}/fct/common/terminal-tools.sh" || exit 1
 source "${ROOT_DIR}/fct/common/common-tools.sh" || exit 1
 source "${ROOT_DIR}/fct/monithornet.fct.sh"
@@ -39,26 +42,39 @@ double_check=false
 while true; do
     debug_ "boucle ${count}"
 
-    answer1_ms=$(send_ping "${PING_SERV1}")
-    if [[ -z $answer1_ms ]] || [[ $(echo "${answer1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
-        answer2_ms=$(send_ping "${PING_SERV2}")
-        if [[ -z $answer2_ms ]] || [[ $(echo "${answer2_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
-            # problème confirmé, gravité à déterminer à partir de answer1
-            if [[ -z $answer1_ms ]]; then
+    answer_1_ms="${LAST_PING_MS:-0}"
+    send_ping "${PING_SERV1}"
+    if [[ $answer_1_ms = 0 ]] || [[ $(echo "${answer_1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
+        answer_1_txt="${LAST_PING_TEXT}"
+        lout "Problème de ping détecté sur serveur primaire : ${PING_SERV1}"
+        lout "Ping reçu : ${answer_1_ms}ms"
+        debug_ "Message complet : ${answer_1_txt}"
+        lout "Ping du serveur secondaire ${PING_SERV2} pour confirmation"
+
+        send_ping "${PING_SERV2}"
+        answer_2_ms="${LAST_PING_MS:-0}"
+        if [[ $answer_2_ms = 0 ]] || [[ $(echo "${answer_2_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
+            # problème confirmé, gravité à déterminer à partir de answer_1_ms
+            answer_2_txt="${LAST_PING_TEXT}"
+
+            MONITOR_PING_MS=$answer_1_ms
+            MONITOR_PING_FULL_ANSWER="${answer_1_txt}"
+            if [[ $answer_1_ms = 0 ]]; then
                 MONITOR_LEVEL_ID=4
-                MONITOR_PING_MS=$answer1_ms
-            elif [[ $(echo "${answer1_ms} < ${LEVEL_2_MS}" | bc) = 1  ]]; then
+            elif [[ $(echo "${answer_1_ms} < ${LEVEL_2_MS}" | bc) = 1  ]]; then
                 MONITOR_LEVEL_ID=1
-                MONITOR_PING_MS=$answer1_ms
-            elif [[ $(echo "${answer1_ms} < ${LEVEL_3_MS}" | bc) = 1  ]]; then
+            elif [[ $(echo "${answer_1_ms} < ${LEVEL_3_MS}" | bc) = 1  ]]; then
                 MONITOR_LEVEL_ID=2
-                MONITOR_PING_MS=$answer1_ms
             else
                 MONITOR_LEVEL_ID=3
-                MONITOR_PING_MS=$answer1_ms
             fi
-            lout "Ping : ${MONITOR_PING_MS}ms\nNiveau : ${MONITOR_LEVEL_ID}"
-            db_insert_into_incident ${MONITOR_LEVEL_ID} ${MONITOR_PING_MS}
+
+            lout "Problème détecté sur le serveur secondaire : ${PING_SERV2}"
+            lout "Ping reçu : ${answer_2_ms}ms"
+            debug_ "Message complet : ${answer_2_txt}"
+            lout "------ AJOUT DE L'INCIDENT À LA BASE DE DONNÉES ------ "
+            lout "Ajout de ping : ${MONITOR_PING_MS}ms\n\tNiveau : ${MONITOR_LEVEL_ID}"
+            db_insert_into_incident ${MONITOR_LEVEL_ID} ${MONITOR_PING_MS} "${MONITOR_PING_FULL_ANSWER}" ||fout "Impossible d'enregistrer l'incident en base de données, la requête est refusée !"
         fi
     fi
 
