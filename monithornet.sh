@@ -27,6 +27,9 @@ check_connect_db
 [[ $PING_TIMEOUT_SEC -gt 0 && $PING_TIMEOUT_SEC -lt 11 ]] || eout "La variable PING_TIMEOUT_SEC doit être un entier entre 1 et 10 (délai d'attente en secondes de la réponse ping)"
 [[ $LOOP_TIME_SEC -gt 0 && $LOOP_TIME_SEC -lt 601 ]] || eout "La variable LOOP_TIME_SEC doit être un entier entre 1 et 600 (temps d'attente en seconde entre 2 ping)"
 
+echo "-------------------------"
+echo "DÉMARRAGE DU PROGRAMME"
+echo "-------------------------"
 if [[ $DB_SOCKET_CONNECT = true ]]; then
     lout "Connexion à la base de données en mode socket"
 else
@@ -35,6 +38,7 @@ fi
 lout "Taille du ping : ${PING_BYTE_SIZE} octets"
 lout "Timeout du ping : ${PING_TIMEOUT_SEC}s"
 lout "Durée entre 2 ping : ${LOOP_TIME_SEC}s"
+echo "-------------------------"
 
 # -- MAIN --
 count=1
@@ -42,8 +46,8 @@ double_check=false
 while true; do
     debug_ "boucle ${count}"
 
-    answer_1_ms="${LAST_PING_MS:-0}"
     send_ping "${PING_SERV1}"
+    answer_1_ms="${LAST_PING_MS:-0}"
     if [[ $answer_1_ms = 0 ]] || [[ $(echo "${answer_1_ms} > ${LEVEL_1_MS}" | bc) = 1 ]]; then
         answer_1_txt="${LAST_PING_TEXT}"
         lout "Problème de ping détecté sur serveur primaire : ${PING_SERV1}"
@@ -75,6 +79,8 @@ while true; do
             lout "------ AJOUT DE L'INCIDENT À LA BASE DE DONNÉES ------ "
             lout "Ajout de ping : ${MONITOR_PING_MS}ms\n\tNiveau : ${MONITOR_LEVEL_ID}"
             db_insert_into_incident ${MONITOR_LEVEL_ID} ${MONITOR_PING_MS} "${MONITOR_PING_FULL_ANSWER}" ||fout "Impossible d'enregistrer l'incident en base de données, la requête est refusée !"
+        else
+            lout "Le serveur secondaire ${PING_SERV2} ping correctement"
         fi
     fi
 
