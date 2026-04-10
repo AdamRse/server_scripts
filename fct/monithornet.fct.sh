@@ -84,8 +84,8 @@ db_insert_into_incident(){
     local full_answer="${3//\'/\\\'}"
 
     if [[ $DB_SOCKET_CONNECT = true ]]; then
-        mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms}, '${full_answer}');" > /dev/null
+        mysql "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms, full_answer) VALUES (${level_id}, ${ping_ms}, '${full_answer}');" > /dev/null
     else
-        mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms) VALUES (${level_id}, ${ping_ms}, '${full_answer}');" > /dev/null
+        mysql -h "${NWD_DB_ADDR}" -u "${NWD_DB_USER}" -p"${NWD_DB_PASSWD}" "${NWD_DB_NAME}" -e "INSERT INTO incident (level_id, ping_ms, full_answer) VALUES (${level_id}, ${ping_ms}, '${full_answer}');" > /dev/null
     fi
 }
